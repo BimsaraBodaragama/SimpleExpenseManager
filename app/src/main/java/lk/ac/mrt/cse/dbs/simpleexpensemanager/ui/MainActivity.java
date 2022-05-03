@@ -84,8 +84,6 @@ public class MainActivity extends AppCompatActivity {
             // getItem is called to instantiate the fragment for the given page.
             // Return the respective fragment.
             switch (position) {
-                case 0:
-                    return ManageExpensesFragment.newInstance(expenseManager);
                 case 1:
                     return AddAccountFragment.newInstance(expenseManager);
                 case 2:
@@ -104,8 +102,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public CharSequence getPageTitle(int position) {
             switch (position) {
-                case 0:
-                    return getString(R.string.label_manage);
                 case 1:
                     return getString(R.string.label_add_account);
                 case 2:
