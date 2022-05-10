@@ -17,13 +17,81 @@
 package lk.ac.mrt.cse.dbs.simpleexpensemanager;
 
 import android.app.Application;
+import android.content.Context;
 import android.test.ApplicationTestCase;
+
+import androidx.test.core.app.ApplicationProvider;
+
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.control.ExpenseManager;
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.control.PersistentExpenseManager;
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.exception.InvalidAccountException;
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.ExpenseType;
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.Transaction;
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.ui.MainActivity;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 /**
  * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
  */
-public class ApplicationTest extends ApplicationTestCase<Application> {
-    public ApplicationTest() {
-        super(Application.class);
+
+public class ApplicationTest {
+
+    private ExpenseManager expenseManager;
+
+    private String accountNo = "19991209";
+    private String bankName = "BOC";
+    private String accountHolderName = "Bimsara";
+
+    @Before
+    public void DatabaseInit(){
+        expenseManager = new PersistentExpenseManager(ApplicationProvider.getApplicationContext());
+
+        double balance = 55300;
+
+        expenseManager.addAccount(accountNo , bankName , accountHolderName , balance);
     }
+
+    @Test
+    public void TAddAccount(){
+
+        List<String> accountNumList = expenseManager.getAccountNumbersList();
+
+        assertTrue(accountNumList.contains(accountNo));
+    }
+
+    @Test
+    public void TAddTransaction() throws InvalidAccountException {
+        int day = 11;
+        int month = 5;
+        int year = 2022;
+        ExpenseType expenseType = ExpenseType.INCOME;
+        String amount = "500";
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, day);
+        Date transactionDate = calendar.getTime();
+
+        int transactionsOldSize = expenseManager.getTransactionLogs().size();
+
+        expenseManager.updateAccountBalance(accountNo , day , month , year , expenseType , amount);
+
+        List<Transaction> transactions = expenseManager.getTransactionLogs();
+
+        assertTrue(transactions.size()>transactionsOldSize);
+    }
+
 }
